@@ -4,29 +4,43 @@ import {Text, View} from 'react-native';
 import movieDB from '../api/movieDB';
 import {Movie, MovieDBResponse} from '../interfaces/movieInterface';
 
+interface MoviesState {
+  nowPlaying: Movie[];
+  popular: Movie[];
+  topRated: Movie[];
+  upcoming: Movie[];
+}
+
 export const useMovies = () => {
-  const [moviesNowPlaying, setMoviesNowPlaying] = React.useState<Movie[]>([]);
-  const [moviesPopular, setMoviesPopular] = React.useState<Movie[]>([]);
   const [isLoading, setIsLoading] = React.useState<Boolean>(false);
+  const [moviesState, setMoviesState] = React.useState<MoviesState>({
+    nowPlaying: [],
+    popular: [],
+    topRated: [],
+    upcoming: [],
+  });
 
   const fetchMovies = async () => {
     setIsLoading(true);
     try {
-      const res = await movieDB.get<MovieDBResponse>('/now_playing');
-      const movies = res.data.results;
-      setMoviesNowPlaying(movies);
-      setIsLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+      const nowplayingPromise = movieDB.get<MovieDBResponse>('/now_playing');
+      const popularPromise = movieDB.get<MovieDBResponse>('/popular');
+      const topRatedPromise = movieDB.get<MovieDBResponse>('/top_rated');
+      const upcomingPromise = movieDB.get<MovieDBResponse>('/upcoming');
 
-  const fetchPopularMovies = async () => {
-    setIsLoading(true);
-    try {
-      const res = await movieDB.get<MovieDBResponse>('/popular');
-      const movies = res.data.results;
-      setMoviesPopular(movies);
+      const response = await Promise.all([
+        nowplayingPromise,
+        popularPromise,
+        topRatedPromise,
+        upcomingPromise,
+      ]);
+
+      setMoviesState({
+        nowPlaying: response[0].data.results,
+        popular: response[1].data.results,
+        topRated: response[2].data.results,
+        upcoming: response[3].data.results,
+      });
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -35,8 +49,7 @@ export const useMovies = () => {
 
   React.useEffect(() => {
     fetchMovies();
-    fetchPopularMovies();
   }, []);
 
-  return {moviesNowPlaying, isLoading, moviesPopular};
+  return {...moviesState, isLoading};
 };

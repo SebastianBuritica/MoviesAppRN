@@ -5,15 +5,15 @@ import {Movie} from '../interfaces/movieInterface';
 
 type Props = {
   title?: string;
-  moviesNowPlaying: Movie[];
+  movies: Movie[];
 };
 
-const HorizontalSlider: React.FC<Props> = ({moviesNowPlaying, title}) => {
+const HorizontalSlider: React.FC<Props> = ({movies, title}) => {
   return (
     <View style={{height: title ? 245 : 220}}>
       <Text style={{fontSize: 30, fontWeight: 'bold'}}>{title}</Text>
       <FlatList
-        data={moviesNowPlaying}
+        data={movies}
         renderItem={({item}: any) => (
           <MoviePoster movie={item} width={140} height={200} />
         )}

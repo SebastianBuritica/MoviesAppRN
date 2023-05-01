@@ -1,7 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
-import {Image, StyleSheet, Text, View} from 'react-native';
+import {Image, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Movie} from '../interfaces/movieInterface';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParams} from '../navigation/types';
 
 type Props = {
   movie: Movie;
@@ -11,14 +14,20 @@ type Props = {
 
 const MoviePoster: React.FC<Props> = ({movie, height = 420, width = 300}) => {
   const imgUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+  const navigation =
+    useNavigation<StackNavigationProp<RootStackParams, 'Details'>>();
 
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.8}
       style={{
         width,
         height,
-        marginHorizontal: 4,
-      }}>
+        marginHorizontal: 2,
+        paddingBottom: 20,
+        paddingHorizontal: 5,
+      }}
+      onPress={() => navigation.navigate('Details', movie)}>
       <View style={styles.imageElevation}>
         <Image
           source={{
@@ -27,7 +36,7 @@ const MoviePoster: React.FC<Props> = ({movie, height = 420, width = 300}) => {
           style={styles.image}
         />
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
